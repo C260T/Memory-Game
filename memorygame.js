@@ -13,7 +13,6 @@ $(document).ready(() => {
         save_data[3] = parseInt($("#high_score").text());
         sessionStorage.memory_game_6 = save_data;
         window.location.assign("index.html");
-        // console.log(save_data)
     })
     $("#save_settings").click(() => {
         saveData();
@@ -35,7 +34,6 @@ if (sessionStorage.getItem("memory_game_6") != null) {
     $('#num_cards').val(save_data[1]);
     $("#scoring_player").text(save_data[2]);
     $("#high_score").text(save_data[3]);
-    console.log("loaded from save: " + save_data);
 } else {
     console.log("no save data");
 }
@@ -235,17 +233,32 @@ function checkForMatch() {
     const optionOneId = cardsChosenId[0];
     const optionTwoId = cardsChosenId[1];
     if (cardsChosen[0] === cardsChosen[1]) {
-        // alert("you found a match");
-        cards[optionOneId].setAttribute("src", "images/blank.png");
+        //hide card 1
         cards[optionOneId].removeEventListener("click", flipCard);
-        cards[optionTwoId].setAttribute("src", "images/blank.png");
+        $('img[data-id="' + cardsChosenId[0] + '"]').slideToggle(500, function () {
+            $(this).attr('src', 'images/blank.png');
+            $(this).css('display', 'flex')
+        });
+        //hide card 2
         cards[optionTwoId].removeEventListener("click", flipCard);
+        $('img[data-id="' + cardsChosenId[1] + '"]').slideToggle(500, function () {
+            $(this).attr('src', 'images/blank.png');
+            $(this).css('display', 'flex')
+        });
         cardsWon.push(cardsChosen);
         score = score + 2;
         correct_score++;
     } else {
-        cards[optionOneId].setAttribute("src", "images/back.png");
-        cards[optionTwoId].setAttribute("src", "images/back.png");
+        $('img[data-id="' + cardsChosenId[0] + '"]').fadeOut(400, function () {
+            $(this).attr("src", "images/back.png");
+            $(this).fadeIn(400);
+        });
+        // cards[optionOneId].setAttribute("src", "images/back.png");
+        // cards[optionTwoId].setAttribute("src", "images/back.png");
+        $('img[data-id="' + cardsChosenId[1] + '"]').fadeOut(400, function () {
+            $(this).attr("src", "images/back.png");
+            $(this).fadeIn(400);
+        });
         cards[optionOneId].addEventListener("click", flipCard);
         cards[optionTwoId].addEventListener("click", flipCard);
         incorrect_score++;
@@ -274,15 +287,16 @@ function flipCard() {
     this.removeEventListener("click", flipCard);
     cardsChosen.push(current_field[cardId].name);
     cardsChosenId.push(cardId);
-    this.setAttribute("src", current_field[cardId].img);
+    $(this).fadeOut(400, function () {
+        $(this).attr("src", current_field[cardId].img);
+        $(this).fadeIn(400);
+    });
     if (cardsChosen.length === 2) {
         setTimeout(checkForMatch, 800);
     }
 
 }
-
 createBoard();
-
 // Clears board when clicked.
 function clearField() {
     $("#cards img").remove();
